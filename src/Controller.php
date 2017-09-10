@@ -2,13 +2,16 @@
 
 require_once __DIR__.'/Tweet.php';
 require_once __DIR__.'/User.php';
+require_once __DIR__.'/DB.php';
 
 class Controller
 {
-    private static $conn;
+    private $db;
+    static $conn;
 
-    private function connect()
+    public function __construct()
     {
+        $this->db = new DB();
         if(! self::$conn instanceof \PDO) {
             self::$conn = new PDO("mysql:host=localhost;dbname=twitter",'root',null,[
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
@@ -30,17 +33,11 @@ class Controller
         return $this->render('homepage',['item'=>"kota"]);
     }
 
-//    public function showItem($item)
-//    {
-//        return $this->render('homepage',['item'=>$item]);
-//    }
-
     public function showTweet($id)
     {
-        $this->connect();
-        $tweet = Tweet::getById(self::$conn,$id);
+        $tweet = $this->db->getById('Tweet',$id);
 
-        if(!$tweet) {
+        if(! $tweet instanceof Tweet) {
             return $this->render('not_fount',['id'=>$id,'object'=>'tweet']);
         }
 
@@ -53,8 +50,7 @@ class Controller
     }
 
     public function showAllTweets($data = ["error"=>""]) {
-        $this->connect();
-        $tweets = Tweet::getAll(self::$conn);
+        $tweets = $this->db->getAll('Tweet');
 
         $html = '';
         foreach ($tweets as $tweet) {
@@ -63,8 +59,7 @@ class Controller
                     'id' => $tweet->getId(),
                     'content' =>$tweet->getContent(),
                     'created_at' =>$tweet->getCreatedAtAsText(),
-                    'user_id' =>User::getById(
-                        self::$conn,
+                    'user_id' =>$this->db->getById('User',
                         $tweet->getUserId()
                     )->getName(),
                 ]);
@@ -79,7 +74,6 @@ class Controller
 
     public function addTweet()
     {
-        $this->connect();
         if(!isset($_POST["content"]) OR !strlen($_POST["content"])) {
             return $this->showAllTweets(["error"=>"Form is empty!!!"]);
         }

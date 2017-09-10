@@ -12,6 +12,11 @@ class User
         return $this->id;
     }
 
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
     public function getName()
     {
         return $this->name;
@@ -37,7 +42,7 @@ class User
         return $this->hashedPass;
     }
 
-    public function setHashedPass($plainPass)
+    public function encryptPass($plainPass)
     {
         $hashedPass = password_hash(
             $plainPass,PASSWORD_BCRYPT,['cost'=>11]
@@ -46,33 +51,9 @@ class User
         $this->hashedPass = $hashedPass;
     }
 
-    public static function getById(PDO $conn, $id) {
-        $stmt  =$conn->prepare("SELECT * FROM user WHERE id=:id");
-        $res = $stmt->execute(['id'=>$id]);
-        if($res) {
-            $array = $stmt->fetch(PDO::FETCH_ASSOC);
-            $user = new User();
-            $user->id = $array["id"];
-            $user->setName($array["name"]);
-            $user->setEmail($array["email"]);
-            $user->hashedPass = $array["hashed_pass"];
-            return $user;
-        }
-        return false;
-    }
-
-    public static function getAll(PDO $conn) {
-        $stmt  =$conn->query("SELECT * FROM user");
-        $users = [];
-        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $array) {
-            $user = new User();
-            $user->id = $array["id"];
-            $user->setName($array["name"]);
-            $user->setEmail($array["email"]);
-            $user->hashedPass = $array["hashed_pass"];
-            $users[] = $user;
-        }
-        return $users;
+    public function setHashedPass($hashedPass)
+    {
+        $this->hashedPass = $hashedPass;
     }
 
     public function save(PDO $conn) {

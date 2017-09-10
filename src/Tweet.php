@@ -13,6 +13,11 @@ class Tweet
         $this->setCreatedAt(new \DateTime());
     }
 
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
     public function getCreatedAtAsText()
     {
         return $this->getCreatedAt()->format('Y-m-d H:i:s');
@@ -66,35 +71,6 @@ class Tweet
         } else {
             $this->createdAt = new \DateTime($createdAt);
         }
-    }
-
-    public static function getById(PDO $conn, $id) {
-        $stmt  =$conn->prepare("SELECT * FROM tweet WHERE id=:id");
-        $res = $stmt->execute(['id'=>$id]);
-        if($res) {
-            $array = $stmt->fetch(PDO::FETCH_ASSOC);
-            $tweet = new Tweet();
-            $tweet->id = $array["id"];
-            $tweet->setUserId($array["user_id"]);
-            $tweet->setContent($array["content"]);
-            $tweet->setCreatedAt($array["created_at"]);
-            return $tweet;
-        }
-        return false;
-    }
-
-    public static function getAll(PDO $conn) {
-        $stmt  =$conn->query("SELECT * FROM tweet");
-        $tweets = [];
-        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $array) {
-            $tweet = new Tweet();
-            $tweet->id = $array["id"];
-            $tweet->setUserId($array["user_id"]);
-            $tweet->setContent($array["content"]);
-            $tweet->setCreatedAt($array["created_at"]);
-            $tweets[] = $tweet;
-        }
-        return $tweets;
     }
 
     public function save(PDO $conn) {
