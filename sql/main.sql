@@ -9,5 +9,19 @@ CREATE TABLE user (
   hashed_pass VARCHAR(255)
 );
 
+CREATE TABLE tweet (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  content VARCHAR(140),
+  user_id INT NOT NULL,
+  created_at DATETIME,
+  FOREIGN KEY (user_id) REFERENCES user(id)
+  ON DELETE CASCADE
+);
+
 INSERT INTO user VALUES
   (null,"adam@spadam.pl","Ada","###");
+
+INSERT INTO tweet VALUES
+  (null,"Jestem adamem",1,NOW()),
+  (null,"Ciągle spadam",1,NOW());
+

@@ -1,6 +1,7 @@
 <?php
 
 require __DIR__."/../src/User.php";
+require __DIR__."/../src/Tweet.php";
 
 $conn = new PDO("mysql:host=localhost;dbname=twitter",'root',null,[
     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
@@ -37,6 +38,26 @@ $user->save($conn);
 
 
 if((User::getById($conn,2))->getEmail() === "marek@zakamarek.pl") {
+    echo "ok\n";
+} else {
+    echo "no\n";
+}
+
+
+$tweet = new Tweet();
+$tweet->setContent("ok");
+$tweet->setUser($user);
+$tweet->save($conn);
+
+//var_dump(Tweet::getAll($conn));
+
+if(count(Tweet::getAll($conn))===3){
+    echo "ok\n";
+} else {
+    echo "no\n";
+}
+
+if(count(Tweet::getAllTweetsByUserId($conn,1))===2){
     echo "ok\n";
 } else {
     echo "no\n";
